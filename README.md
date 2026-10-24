@@ -23,7 +23,7 @@
 
 ## 📸 Project Screenshot
 
-![Storyloom Story Preview](storyloom-story-preview.png)
+![Storyloom Preview](storyloom-story-preview.png.png)
 
 ## 📌 How to Use
 
