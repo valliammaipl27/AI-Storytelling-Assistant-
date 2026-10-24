@@ -23,7 +23,7 @@
 
 ## 📸 Project Screenshot
 
-[![Storyloom Preview](storyloom-story-preview.png.png)](https://valliammaipl27.github.io/AI-Storytelling-Assistant-/)
+https://valliammaipl27.github.io/AI-Storytelling-Assistant-/
 
 ## 📌 How to Use
 
