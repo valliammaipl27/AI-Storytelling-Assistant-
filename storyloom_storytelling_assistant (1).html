@@ -1,0 +1,202 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Storyloom — AI Storytelling Assistant</title>
+<style>
+:root {
+  --site-primary: #6D4AFF;
+  --site-on-primary: #FFFFFF;
+  --site-secondary: #E9E3FF;
+  --site-on-secondary: #28165F;
+  --site-background: #F7F5FF;
+  --site-on-background: #211B35;
+  --site-font-body: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --site-font-heading: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --site-heading-scale: 1;
+  --site-spacing-scale: 1;
+  --site-radius-scale: 1;
+  --site-decoration-opacity: 1;
+}
+* { box-sizing: border-box; }
+body { margin: 0; font-family: var(--site-font-body); color: var(--site-on-background); background: var(--site-background); }
+#app { min-height: 100vh; width: 100%; border-radius: 0; background-color: var(--site-background); color: var(--site-on-background); }
+button, input, textarea, select { font: inherit; }
+button { cursor: pointer; }
+.topbar { display:flex; justify-content:space-between; align-items:center; padding: calc(20px * var(--site-spacing-scale)) max(5vw, 22px); background: var(--site-primary); color: var(--site-on-primary); }
+.brand { display:flex; align-items:center; gap:12px; font-weight:800; letter-spacing:-.04em; font-size:1.25rem; }
+.logo { display:grid; place-items:center; width:38px; height:38px; border-radius:13px; background:rgba(255,255,255,.18); font-size:20px; }
+.topbar small { opacity:.82; }
+.hero { padding: clamp(35px, 6vw, 70px) max(5vw, 22px) 34px; background:linear-gradient(135deg, var(--site-primary), #9B79FF); color:#fff; position:relative; overflow:hidden; }
+.hero:after { content:""; position:absolute; width:280px; height:280px; border-radius:50%; border:50px solid rgba(255,255,255,.09); right:-50px; top:-110px; opacity:var(--site-decoration-opacity); pointer-events:none; }
+.eyebrow { text-transform:uppercase; font-size:.75rem; letter-spacing:.16em; font-weight:800; opacity:.85; }
+h1 { font-family:var(--site-font-heading); font-size:calc(clamp(2.2rem, 5vw, 4rem) * var(--site-heading-scale)); letter-spacing:-.06em; line-height:1.02; max-width:760px; margin:14px 0; }
+.hero p { max-width:660px; line-height:1.7; color:#F2EDFF; margin:0; font-size:1.05rem; }
+main { max-width:1180px; margin:auto; padding:32px max(5vw, 22px) 60px; }
+.tabs { display:flex; gap:8px; overflow-x:auto; padding-bottom:18px; }
+.tab { border:1px solid #DED7F8; background:light-dark(#FFFFFF,#262239); color:light-dark(#51466E,#E7E0FF); border-radius:999px; padding:11px 16px; white-space:nowrap; font-weight:700; }
+.tab.active { background:var(--site-primary); color:white; border-color:var(--site-primary); }
+.layout { display:grid; grid-template-columns:minmax(0, .9fr) minmax(0, 1.1fr); gap:22px; align-items:start; }
+.panel { background:light-dark(#FFFFFF,#211E30); border:1px solid light-dark(#E8E2F5,#39334D); border-radius:calc(22px * var(--site-radius-scale)); padding:calc(24px * var(--site-spacing-scale)); box-shadow:0 12px 30px rgba(42,25,86,.05); }
+.panel h2 { margin:0 0 8px; font-size:1.22rem; letter-spacing:-.03em; }
+.muted { color:light-dark(#746B8C,#BDB4D7); line-height:1.6; font-size:.92rem; }
+label { display:block; font-weight:750; margin:18px 0 8px; font-size:.9rem; }
+textarea, input, select { width:100%; border:1px solid light-dark(#DCD5EB,#4A4260); background:light-dark(#FCFBFF,#171522); color:light-dark(#211B35,#F8F5FF); border-radius:12px; padding:13px 14px; outline:none; }
+textarea:focus, input:focus, select:focus { border-color:var(--site-primary); box-shadow:0 0 0 3px rgba(109,74,255,.14); }
+textarea { min-height:130px; resize:vertical; line-height:1.5; }
+.btn { border:0; background:var(--site-primary); color:white; font-weight:800; padding:13px 17px; border-radius:12px; transition:transform .15s ease, opacity .15s ease; }
+.btn:hover { transform:translateY(-1px); }
+.btn.secondary { background:var(--site-secondary); color:var(--site-on-secondary); }
+.btn.outline { background:transparent; border:1px solid light-dark(#DCD5EB,#4A4260); color:light-dark(#51466E,#E7E0FF); }
+.actions { display:flex; gap:9px; flex-wrap:wrap; margin-top:16px; }
+.output-head { display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:16px; }
+.pill { background:var(--site-secondary); color:var(--site-on-secondary); border-radius:999px; font-size:.76rem; padding:6px 10px; font-weight:800; }
+.result { white-space:pre-wrap; line-height:1.75; font-size:.96rem; }
+.empty { min-height:300px; display:grid; place-items:center; text-align:center; color:light-dark(#82799B,#BDB4D7); padding:24px; }
+.empty .spark { font-size:2.6rem; margin-bottom:10px; }
+.scene-grid { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:12px; margin-top:18px; }
+.scene { border:1px solid light-dark(#E8E2F5,#39334D); border-radius:15px; padding:15px; background:light-dark(#FCFBFF,#191726); }
+.scene .num { color:var(--site-primary); font-size:.75rem; font-weight:900; text-transform:uppercase; letter-spacing:.08em; }
+.scene h3 { margin:8px 0; font-size:1rem; }
+.scene p { margin:0; font-size:.88rem; line-height:1.6; color:light-dark(#746B8C,#BDB4D7); }
+.storyboard { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:12px; margin-top:14px; }
+.frame { min-height:150px; padding:14px; border-radius:15px; background:linear-gradient(145deg,#E9E3FF,#D4C9FF); color:#28165F; display:flex; flex-direction:column; justify-content:space-between; }
+.frame:nth-child(2) { background:linear-gradient(145deg,#DDF5F0,#B6E7DC); color:#16463D; }
+.frame:nth-child(3) { background:linear-gradient(145deg,#FFEBD7,#FFD0A0); color:#673C16; }
+.frame strong { font-size:.8rem; text-transform:uppercase; letter-spacing:.08em; }
+.frame span { font-size:.88rem; line-height:1.5; }
+.notice { margin-top:18px; padding:13px 15px; border-radius:12px; background:light-dark(#F1EDFF,#302849); color:light-dark(#574781,#E7DEFF); font-size:.86rem; line-height:1.55; }
+footer { text-align:center; color:light-dark(#82799B,#BDB4D7); padding:24px; font-size:.85rem; }
+.hidden { display:none !important; }
+@media(max-width:820px) { .layout { grid-template-columns:1fr; } .scene-grid,.storyboard { grid-template-columns:1fr; } .topbar small { display:none; } }
+</style>
+</head>
+<body>
+<div id="app">
+  <header class="topbar">
+    <div class="brand"><span class="logo">✦</span><span>Storyloom</span></div>
+    <small>AI Storytelling & Scriptwriting Assistant</small>
+  </header>
+  <section class="hero">
+    <div class="eyebrow">Imagine · Draft · Shape</div>
+    <h1>Turn a tiny idea into a story worth telling.</h1>
+    <p>Build a story outline, shape your scenes, and sketch a storyboard. Start with an idea — your next story begins here.</p>
+  </section>
+  <main>
+    <nav class="tabs" aria-label="Project sections">
+      <button class="tab active" data-tab="writer">✍️ Story writer</button>
+      <button class="tab" data-tab="storyboard">🎬 Storyboard</button>
+      <button class="tab" data-tab="compare">⚖️ Compare drafts</button>
+    </nav>
+    <section id="writer" class="tab-content">
+      <div class="layout">
+        <div class="panel">
+          <h2>Your story idea</h2>
+          <p class="muted">Describe a character, a challenge, or a world. You can edit the example or write your own.</p>
+          <label for="idea">Story prompt</label>
+          <textarea id="idea">A village girl uses technology to solve her village's water problem.</textarea>
+          <label for="genre">Genre</label>
+          <select id="genre">
+            <option>Inspirational drama</option><option>Adventure</option><option>Mystery</option><option>Science fiction</option><option>Fantasy</option><option>Comedy</option>
+          </select>
+          <label for="audience">Audience</label>
+          <select id="audience"><option>General audience</option><option>Children</option><option>Young adults</option></select>
+          <div class="actions">
+            <button class="btn" id="generate">Generate story</button>
+            <button class="btn secondary" id="example">Try another idea</button>
+          </div>
+          <div class="notice">This first version uses an in-browser story builder, so it works without an API key or paid service. It is a working prototype, not a live Gemini connection.</div>
+        </div>
+        <div class="panel">
+          <div class="output-head"><div><h2>Your story draft</h2><div class="muted" id="status">Ready when you are.</div></div><span class="pill">DRAFT</span></div>
+          <div id="output" class="empty"><div><div class="spark">✧</div><strong>Your story will appear here</strong><p class="muted">Enter an idea and select “Generate story”.</p></div></div>
+          <div class="actions"><button class="btn secondary" id="save" disabled>Save .txt</button><button class="btn outline" id="copy" disabled>Copy draft</button></div>
+        </div>
+      </div>
+      <div id="scenesWrap" class="panel hidden" style="margin-top:22px">
+        <h2>Scene breakdown</h2><p class="muted">A quick three-scene structure to develop into a script.</p><div class="scene-grid" id="scenes"></div>
+      </div>
+    </section>
+    <section id="storyboard" class="tab-content hidden">
+      <div class="panel">
+        <h2>Storyboard planner</h2><p class="muted">Create a simple visual plan from your latest draft. These are text-based storyboard cards you can use as image prompts.</p>
+        <div id="frames" class="storyboard"><div class="frame"><strong>Frame 01 · Setup</strong><span>Generate a story first to fill this frame.</span></div><div class="frame"><strong>Frame 02 · Challenge</strong><span>Your main obstacle goes here.</span></div><div class="frame"><strong>Frame 03 · Resolution</strong><span>Show how the story changes.</span></div></div>
+        <div class="actions"><button class="btn" id="refreshFrames">Update storyboard</button><button class="btn secondary" id="saveFrames">Save storyboard .txt</button></div>
+      </div>
+    </section>
+    <section id="compare" class="tab-content hidden">
+      <div class="layout">
+        <div class="panel"><h2>Draft A · Your original</h2><p class="muted">Write or paste your manual version.</p><textarea id="draftA" placeholder="Write your own opening or scene here..."></textarea></div>
+        <div class="panel"><h2>Draft B · Story builder</h2><p class="muted">This fills with your generated story draft.</p><textarea id="draftB" placeholder="Generate a story first..."></textarea></div>
+      </div>
+      <div class="panel" style="margin-top:22px"><h2>Compare your drafts</h2><p class="muted">Use this checklist to reflect on clarity, character, emotion, originality, and structure.</p><div class="scene-grid"><div class="scene"><div class="num">01 · Clarity</div><h3>Can readers follow it?</h3><p>Compare whether the main goal and problem are easy to understand.</p></div><div class="scene"><div class="num">02 · Character</div><h3>Does the hero change?</h3><p>Look for motivation, choices, and growth across the story.</p></div><div class="scene"><div class="num">03 · Emotion</div><h3>Does it feel meaningful?</h3><p>Identify which version creates a stronger emotional connection.</p></div></div><label for="reflection">Your reflection</label><textarea id="reflection" placeholder="Which draft is stronger and why? What would you improve?"></textarea><div class="actions"><button class="btn" id="saveCompare">Save comparison .txt</button></div></div>
+    </section>
+  </main>
+  <footer>Storyloom · A student project prototype · Your text stays in this browser until you save it.</footer>
+</div>
+<script>
+const $ = (id) => document.getElementById(id);
+let latest = "";
+let latestScenes = [];
+const examples = [
+  "A shy student discovers a way to make her school library accessible to every child.",
+  "A village girl uses technology to solve her village's water problem.",
+  "Two friends build a small robot that helps an elderly neighbour live independently."
+];
+function titleFromIdea(idea) {
+  const clean = idea.replace(/[.!?]+$/,"").trim();
+  return clean.length > 54 ? clean.slice(0,51).trim()+"..." : clean.charAt(0).toUpperCase()+clean.slice(1);
+}
+function buildStory(idea, genre, audience) {
+  const hero = /girl|woman|she|her/i.test(idea) ? "Meera" : /boy|man|he|his/i.test(idea) ? "Arun" : "the young dreamer";
+  const problem = /water/i.test(idea) ? "the village's unreliable water supply" : /library|book|school/i.test(idea) ? "a lack of access to learning resources" : "a problem everyone else had learned to ignore";
+  const solution = /water/i.test(idea) ? "a simple water-monitoring system using shared phones, rain records, and a community map" : /library|book|school/i.test(idea) ? "a shared reading corner and a simple lending tracker" : "a practical idea built with curiosity, teamwork, and the tools available";
+  const tone = genre.toLowerCase();
+  const intro = `${hero} had always believed that a small idea could make a big difference. In a place where people were used to saying “nothing can change,” ${hero.toLowerCase()} chose to ask one more question.`;
+  const middle = `The challenge was clear: ${problem}. Instead of waiting for someone else to act, ${hero.toLowerCase()} listened to neighbours, collected their experiences, and looked for a pattern. The first attempt failed, but the failure revealed what the plan was missing.`;
+  const end = `With help from a few friends, ${hero.toLowerCase()} introduced ${solution}. It was not perfect, and it did not solve everything overnight. But people could finally see the problem clearly and work on it together. By the end, the biggest change was not just the new solution — it was the community's belief that they could shape their own future.`;
+  const title = titleFromIdea(idea);
+  const story = `${title}\nGenre: ${genre} | Audience: ${audience}\n\nSTORY OUTLINE\nBeginning: ${intro}\n\nMiddle: ${middle}\n\nEnding: ${end}\n\nSHORT SCRIPT\n\nSCENE 1 — THE PROBLEM\nEXT. VILLAGE / COMMUNITY SPACE — MORNING\n${hero} watches people struggle with ${problem}. Rather than walk away, ${hero.toLowerCase()} starts asking questions and writing down what people say.\n\nSCENE 2 — THE FIRST ATTEMPT\nINT. SMALL WORKSPACE — EVENING\nA rough plan takes shape: ${solution}. The first attempt does not work as expected. ${hero} feels discouraged, then notices the missing piece and invites others to help.\n\nSCENE 3 — A SHARED SOLUTION\nEXT. COMMUNITY SPACE — DAY\nThe community tests the improved idea. Small signs of progress appear. ${hero} smiles as neighbours begin sharing responsibility. The story ends with a hopeful next step rather than a magical overnight fix.\n\nCREATIVE NOTE\nThis is a first draft. Add specific local details, dialogue, and a personal choice that only your main character would make. For a ${tone} story, consider strengthening the emotional turning point.`;
+  latestScenes = [
+    {n:"Scene 01 · Setup",title:"The problem becomes personal",desc:`${hero} sees how ${problem} affects people and decides to listen before acting.`},
+    {n:"Scene 02 · Conflict",title:"The first plan fails",desc:`The team tries ${solution}, learns from a setback, and revises the plan.`},
+    {n:"Scene 03 · Resolution",title:"Progress through teamwork",desc:`The community tests the improved idea and discovers a reason to keep working together.`}
+  ];
+  return story;
+}
+function renderScenes() {
+  $("scenes").innerHTML = latestScenes.map(s => `<article class="scene"><div class="num">${s.n}</div><h3>${s.title}</h3><p>${s.desc}</p></article>`).join("");
+  $("scenesWrap").classList.remove("hidden");
+  $("frames").innerHTML = latestScenes.map((s,i)=>`<div class="frame"><strong>Frame 0${i+1} · ${["Setup","Challenge","Resolution"][i]}</strong><span>${s.desc}</span></div>`).join("");
+}
+function generate() {
+  const idea = $("idea").value.trim();
+  if (!idea) { $("status").textContent = "Please enter a story idea first."; $("idea").focus(); return; }
+  latest = buildStory(idea, $("genre").value, $("audience").value);
+  $("output").className = "result";
+  $("output").textContent = latest;
+  $("status").textContent = "Draft generated · ready to edit";
+  $("save").disabled = false; $("copy").disabled = false;
+  $("draftB").value = latest;
+  renderScenes();
+}
+function downloadText(filename, text) {
+  const blob = new Blob([text], {type:"text/plain;charset=utf-8"});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a"); a.href=url; a.download=filename; document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
+}
+document.querySelectorAll(".tab").forEach(btn => btn.addEventListener("click", () => {
+  document.querySelectorAll(".tab").forEach(b=>b.classList.toggle("active",b===btn));
+  document.querySelectorAll(".tab-content").forEach(section=>section.classList.toggle("hidden",section.id!==btn.dataset.tab));
+}));
+$("generate").addEventListener("click", generate);
+$("example").addEventListener("click", () => { const current=$("idea").value; const pick=examples.find(x=>x!==current)||examples[0]; $("idea").value=pick; generate(); });
+$("save").addEventListener("click", ()=>downloadText("story-draft.txt", latest));
+$("copy").addEventListener("click", async ()=>{try { await navigator.clipboard.writeText(latest); $("status").textContent="Draft copied to clipboard."; } catch(e) { $("status").textContent="Clipboard blocked here — use Save .txt instead."; }});
+$("refreshFrames").addEventListener("click", ()=>{if(!latestScenes.length) generate(); else renderScenes();});
+$("saveFrames").addEventListener("click", ()=>downloadText("storyboard.txt", latestScenes.map(s=>`${s.n}\n${s.title}\n${s.desc}`).join("\n\n")||"Generate a story first to create storyboard frames."));
+$("saveCompare").addEventListener("click", ()=>downloadText("draft-comparison.txt", `DRAFT A — MANUAL\n${$("draftA").value}\n\nDRAFT B — STORY BUILDER\n${$("draftB").value}\n\nREFLECTION\n${$("reflection").value}`));
+</script>
+</body>
+</html>
