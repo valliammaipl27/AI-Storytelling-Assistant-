@@ -21,9 +21,6 @@
 
 [**Open Storyloom Website**](https://valliammaipl27.github.io/AI-Storytelling-Assistant-/)
 
-## 📸 Project Screenshot
-
-https://valliammaipl27.github.io/AI-Storytelling-Assistant-/
 
 ## 📌 How to Use
 
