@@ -21,6 +21,10 @@
 
 [**Open Storyloom Website**](https://valliammaipl27.github.io/AI-Storytelling-Assistant-/)
 
+## 📸 Project Screenshot
+
+![Storyloom Story Preview](storyloom-story-preview.png)
+
 ## 📌 How to Use
 
 1. Open the Storyloom website.
